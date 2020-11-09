@@ -1,16 +1,5 @@
 import React from 'react';
-import { Link, navigate } from 'gatsby';
-
-// EXTRA INFO
-function goToSlicemasters() {
-  // 1. Wait for 2 secons
-  setTimeout(() => {
-    console.log('Go to sliders!!!!!');
-    // Replace : True add to browser history
-    navigate('/slicemasters', { replace: true });
-  }, 2000);
-  // 2.Change the page
-}
+import { Link } from 'gatsby';
 
 export default function Nav() {
   return (
