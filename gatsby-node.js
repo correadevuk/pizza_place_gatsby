@@ -1,4 +1,5 @@
 import path from 'path';
+
 // import PizzasPage from './src/pages/pizzas';
 
 async function turnPizzasIntoPages({ graphql, actions }) {
@@ -32,10 +33,46 @@ async function turnPizzasIntoPages({ graphql, actions }) {
   });
 }
 
+async function turnToppingsIntoPages({ graphql, actions }) {
+  // 1 - Get the template
+  const toppingTemplate = path.resolve(`./src/pages/pizzas.js`);
+  // 2 - query all the Toppings
+  const { data } = await graphql(`
+    query {
+      toppings: allSanityTopping {
+        nodes {
+          name
+          id
+        }
+      }
+    }
+  `);
+  // 3 - createPage for that topping
+  data.toppings.nodes.forEach((topping) => {
+    // console.log('Creating page for topping', topping.name);
+    actions.createPage({
+      path: `topping/${topping.name}`,
+      component: toppingTemplate,
+      context: {
+        topping: topping.name,
+        // TODO: Regex for topping
+        // toppingRegex: `/${topping.name}/i`
+      },
+    });
+  });
+  // 4 - pass topping data to pizza.js
+}
+
 export async function createPages(params) {
   //   console.log('Between building schema and create pages on log');
-  // 1 - Pizzas
-  await turnPizzasIntoPages(params);
+  // This two itens are not related JS will not wait for first a wait func and wont
+  // wait for turnPizzasIntoPages. They need to be wrapped into Promise.all
+  // 1 - Wait for all promises to be resolved before finishing this function
+  await Promise.all([
+    turnPizzasIntoPages(params),
+    turnToppingsIntoPages(params),
+  ]);
+
   // 2 - Toppings
   // 3 - Slicemasters
 }
